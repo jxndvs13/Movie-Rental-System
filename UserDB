@@ -1,0 +1,169 @@
+package movie_rental_system;
+
+import java.sql.*;
+
+public class UserDB {
+    static final String DB_URL = "jdbc:mysql://localhost:3306/Movie_DB";
+    static final String USER = "root";
+    static final String PASS = "";
+
+    // This is to Create a New User
+    public static void createUser(String id, String name, String password) { //first is start
+        String query = "INSERT INTO users (id, name, password, credit) VALUES (?, ?, ?, 0)"; //then query insert
+
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS); //connect via sql
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+        	//id,name, password pstmt
+            pstmt.setString(1, id);
+            pstmt.setString(2, name);
+            pstmt.setString(3, password);
+            //update, say it did
+            pstmt.executeUpdate();
+            System.out.println("User created!"); //put system outs here!
+            //exception
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    // I need a way to login 
+    public static User login(String name, String password) {
+        String query = "SELECT * FROM users WHERE name=? AND password=?";
+        
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+        	
+        	//name and password
+            pstmt.setString(1, name);
+            pstmt.setString(2, password);
+            
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                return new User(
+                    rs.getString("id"),
+                    rs.getString("name"),
+                    rs.getString("password")
+                );
+            }
+            //exception, again, just include this
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return null; // login fail
+    }
+    
+    // This is the first one, to Change a Name
+    public static void changeName(String id, String newName) {
+        String query = "UPDATE users SET name=? WHERE id=?";
+        
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+        	
+            pstmt.setString(1, newName);
+            pstmt.setString(2, id);
+            
+            pstmt.executeUpdate();
+            System.out.println("Your Name has been Changed. " );
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    // Then this is to Change a Password
+    public static void changePassword(String id, String newPassword) {
+        String query = "UPDATE users SET password=? WHERE id=?";
+        
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+        	
+            pstmt.setString(1, newPassword);
+            pstmt.setString(2, id);
+            
+            pstmt.executeUpdate();
+            System.out.println("Password Changed. ");
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    // Now for veiwing, like Credit
+    public static void viewCredit(int id) {
+        String query = "SELECT credit FROM users WHERE id=?";
+        
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+        	
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                System.out.println("Credit: $" + rs.getFloat("credit")); //it is a float!!
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Then add Credit
+    public static void addCredit(int id, float amount) {
+        String query = "UPDATE users SET credit = credit + ? WHERE id=?";
+        
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+        	
+            pstmt.setFloat(1, amount);
+            pstmt.setInt(2, id);
+            //added it
+            pstmt.executeUpdate();
+            System.out.println("Credit added.");
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Also history, so add to history
+    public static void addHistory(int userId, String record) {
+        String query = "INSERT INTO history (user_id, record) VALUES (?, ?)";
+        
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+        	
+            pstmt.setInt(1, userId);
+            pstmt.setString(2, record);
+            
+            pstmt.executeUpdate();
+            System.out.println("The History has been added.");
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // don't forgget to view history
+    public static void viewHistory(int userId) {
+        String query = "SELECT record FROM history WHERE user_id=?";
+        
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+        	
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            
+            System.out.println("History:");
+            while (rs.next()) {
+                System.out.println("Hist - " + rs.getString("record")); //get string, but maybe array, **check**
+            }
+            // last exception
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    
+}
