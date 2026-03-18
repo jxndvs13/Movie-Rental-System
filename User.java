@@ -25,12 +25,12 @@ public class User {
     }
     
     // This is for changing a Name
-    public void changeName(String newName) {
+    public void changename(String newName) {
         this.name = newName;
     }
     
     // To Change a Password
-    public void changePassword(String oldPassword, String newPassword) {
+    public void changepassword(String oldPassword, String newPassword) {
         if (this.password.equals(oldPassword)) {
             this.password = newPassword;
             System.out.println("Password updated successfully.");
@@ -40,37 +40,37 @@ public class User {
     }
     
     // View an Account (or the credit, maybe)
-    public float viewAccount() {
+    public float viewaccount() {
         return credit;
     }
     
     // Adding Credit
-    public void addCredit(float amount) {
+    public void addcredit(float amount) {
         if (amount > 0) {
             credit += amount;
         }
     }
     
     // View History
-    public ArrayList<String> viewHistory() {
+    public ArrayList<String> viewhistory() {
         return history;
     }
     
     // Add to the History (when renting/returning movies)
-    public void addToHistory(String record) {
+    public void addtohistory(String record) {
         history.add(record);
     }
     
     // Check out Move
-    public void checkOutMovie(String movieTitle) {
+    public void checkoutmovie(String movieTitle) {
         this.checkedOut = movieTitle;
-        addToHistory("Checked out: " + movieTitle);
+        addtohistory("Checked out: " + movieTitle);
     }
     
     // To Return a Movie
-    public void returnMovie() {
+    public void returnmovie() {
         if (!checkedOut.isEmpty()) {
-            addToHistory("Returned: " + checkedOut);
+        	addtohistory("Returned: " + checkedOut);
             checkedOut = "";
         }
     }
@@ -80,11 +80,11 @@ public class User {
         return id;
     }
     
-    public String getName() {
+    public String getname() {
         return name;
     }
     
-    public String getCheckedOut() {
+    public String getcheckedout() {
         return checkedOut;
     }
 }
