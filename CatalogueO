@@ -1,0 +1,58 @@
+package movie_rental_system;
+
+import java.sql.*;
+import java.util.Scanner;
+
+public class CatalogueO {
+	static final String DB_URL = "jdbc:mysql://localhost:3306/Movie_DB";
+	static final String USER = "root";
+	static final String PASS = "";
+	static final String Select = "SELECT id, title, year, stock FROM movies WHERE id = ?";
+	static final String StockTo1 = "UPDATE movies set stock=1 WHERE id = 4";
+	static final String Delete = "DELETE FROM movies WHERE id = 4";
+	static Scanner scnr = new Scanner(System.in);
+	   
+	public static void main(String[] args) {
+		// Open a connection
+	      	try(Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+	      		Statement stmt = conn.createStatement();
+	      	) {
+	      		// Let us check if it returns a true Result Set or not.
+	      		Boolean ret = stmt.execute(StockTo1);
+	      		System.out.println("Return value is : " + ret.toString() );
+	      		
+	      		int rows = stmt.executeUpdate(Delete);
+	      		System.out.println("Rows impacted : " + rows );
+
+	      		int searchId = 1;
+	      		PreparedStatement pstmt = conn.prepareStatement(Select);
+	      		pstmt.setInt(1, searchId);  // replace ? with your variable
+	      		ResultSet rs = pstmt.executeQuery(Select);		      
+
+	      		// Extract data from result set
+	      		while (rs.next()) {
+	      			System.out.print("ID: " + rs.getInt("id"));
+	      			System.out.print(", Title: " + rs.getString("title"));
+	      			System.out.print(", Year: " + rs.getInt("year"));
+	      			System.out.println(", In Stock: " + rs.getInt("stock"));
+	      		}
+	      		rs.close();
+	      } catch (SQLException e) {
+	    	  	e.printStackTrace();
+	      } 
+	}
+	
+	static void printCatalogue(ResultSet rs) {
+		try {
+			while (rs.next()) {
+				System.out.print("ID: " + rs.getInt("id"));
+				System.out.print(", Title: " + rs.getString("title"));
+				System.out.print(", Year: " + rs.getInt("year"));
+				System.out.println(", In Stock: " + rs.getInt("stock"));
+			}
+		} catch (SQLException e) {
+    	  	e.printStackTrace();
+		} 
+		
+	}
+}
