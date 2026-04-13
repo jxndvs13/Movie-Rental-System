@@ -1,0 +1,85 @@
+package movie_rental_system;
+
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.text.NumberFormat;
+import javax.swing.JButton;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+
+public class SystemFrame extends JFrame implements ActionListener, ChangeListener {
+	private JTextArea catA;
+	private JTextField selectF;
+	private JSpinner searchS;
+	private JButton rentB;
+	private JButton returnB;
+	
+	SystemFrame() {
+		JLabel catL = new JLabel("Full Catalogue");
+		JLabel selectL = new JLabel("Selected Film");
+		JLabel idL = new JLabel("Enter ID:");
+		
+		catA = new JTextArea(20,20); //height, width
+		JScrollPane scrollP = new JScrollPane(catA);
+		catA.setEditable(false);
+		
+		selectF = new JTextField(15);
+		selectF.setEditable(false);
+		
+		SpinnerNumberModel idM = new SpinnerNumberModel(0, 0, 2, 1); //init, min, max, step
+		searchS = new JSpinner(idM);
+		searchS.addChangeListener(this);
+		
+		rentB = new JButton("Rent");
+		rentB.addActionListener(this);
+		
+		returnB = new JButton("Return");
+		returnB.addActionListener(this);
+		
+		setLayout(new GridBagLayout());
+		GridBagConstraints layC = new GridBagConstraints();
+		layC.insets = new Insets(10,10,10,10);
+		layC.gridx = 0;
+		layC.gridy = 0;
+		add(catL, layC);
+		
+		layC.gridx = 1;
+		add(selectL, layC);
+		
+		layC.gridx = 0;
+		layC.gridy = 2;
+		layC.gridheight = 4;
+		add(catA, layC);
+		
+		layC.gridx = 1;
+		layC.gridheight = 1;
+		layC.gridwidth = 2;
+		add(selectF, layC);
+		
+		layC.gridy = 3;
+		layC.gridwidth = 1;
+		add(idL, layC);
+		
+		layC.gridx = 3;
+		add(searchS, layC);
+	}
+	
+	public static void main(String[] args) {
+		SystemFrame frame = new SystemFrame();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.pack();
+		frame.setVisible(true);
+	}
+}
