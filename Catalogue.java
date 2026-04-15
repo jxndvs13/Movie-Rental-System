@@ -1,4 +1,4 @@
-package movieRentalSystem;
+package movie_rental_system;
 
 import java.sql.*;
 import java.util.Scanner;
@@ -23,12 +23,12 @@ public class Catalogue {
 			System.out.println("");
 			
 			if (op == 1) {
-				viewCat();
+				System.out.print(viewCat());
 			}
 			
 			if (op == 2) {
 				System.out.print("Enter Movie ID: ");
-				displayMov(scnr.nextInt());
+				System.out.print(displayMov(scnr.nextInt()));
 			}
 			
 			if (op == 3) {
@@ -49,44 +49,50 @@ public class Catalogue {
 		viewCat();
 	}
 	
-	static void viewCat() {
+	static String viewCat() {
 		String Select = "SELECT id, title, year, stock FROM movies";
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
 	            PreparedStatement pstmt = conn.prepareStatement(Select)) {
 				
 	            ResultSet rs = pstmt.executeQuery();
-	            
+	            String printable = "";
+
 	            while (rs.next()) {
-	      			System.out.print("ID: " + rs.getInt("id"));
-	      			System.out.print(", Title: " + rs.getString("title"));
-	      			System.out.print(", Year: " + rs.getInt("year"));
-	      			System.out.println(", In Stock: " + rs.getInt("stock"));
+	            	printable = printable + "ID: " + rs.getInt("id");
+	      			printable = printable + ", Title: " + rs.getString("title") + "\n";
+	      			printable = printable + "          Year: " + rs.getInt("year");
+	      			printable = printable + ", In Stock: " + rs.getInt("stock") + "\n";
 	      		}
 	      		rs.close();
+	      		return printable;
 	            // last exception
 	    } catch (SQLException e) {
 	            e.printStackTrace();
+	            return "Connection Broken";
 	    }
 	}
 	
-	static void displayMov(int fid) {
+	static String displayMov(int fid) {
 		String Find = "SELECT id, title, year, stock FROM movies WHERE id = ?";
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
 	            PreparedStatement pstmt = conn.prepareStatement(Find)) {
 
 				pstmt.setFloat(1, fid);
 	            ResultSet rs = pstmt.executeQuery();
+	            String printable = "";
 	            
 	            while (rs.next()) {
-	      			System.out.print("ID: " + rs.getInt("id"));
-	      			System.out.print(", Title: " + rs.getString("title"));
-	      			System.out.print(", Year: " + rs.getInt("year"));
-	      			System.out.println(", In Stock: " + rs.getInt("stock"));
+	      			printable = printable + "ID: " + rs.getInt("id");
+	      			printable = printable + ", Title: " + rs.getString("title") + "\n";
+	      			printable = printable + "          Year: " + rs.getInt("year");
+	      			printable = printable + ", In Stock: " + rs.getInt("stock");
 	      		}
 	      		rs.close();
+	            return printable;
 	            // last exception
 	    } catch (SQLException e) {
 	            e.printStackTrace();
+	            return "Connection Broken";
 	    }
 	}
 	
@@ -144,11 +150,19 @@ public class Catalogue {
 	
 	static void reduceStock(int fid) {
 		String reduceStock = "UPDATE movies SET stock = stock - 1 WHERE id = ?";
+		String getStock = "SELECT stock FROM movies WHERE id = ?";
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-	            PreparedStatement pstmt = conn.prepareStatement(reduceStock)) {
+	            PreparedStatement pstmt = conn.prepareStatement(reduceStock);
+				PreparedStatement getstock = conn.prepareStatement(getStock)) {
 
-				pstmt.setInt(1, fid);
-	            pstmt.executeUpdate();
+			getstock.setInt(1, fid);
+            ResultSet rs = getstock.executeQuery();
+			pstmt.setInt(1, fid);
+			while (rs.next()) {
+				if(rs.getFloat("stock") > 0) {
+					pstmt.executeUpdate();
+				}
+			}
 	            
 	            // last exception
 	    } catch (SQLException e) {
