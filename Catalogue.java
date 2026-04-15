@@ -1,185 +1,131 @@
 package movie_rental_system;
 
-import java.sql.*;
-import java.util.Scanner;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.text.NumberFormat;
+import javax.swing.JButton;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 
-public class Catalogue {
-	static final String DB_URL = "jdbc:mysql://localhost:3306/Movie_DB";
-	static final String USER = "root";
-	static final String PASS = "";
-	static Scanner scnr = new Scanner(System.in);
+public class SystemFrame extends JFrame implements ActionListener, ChangeListener {
+	private JTextArea catA;
+	private JTextArea selectA;
+	private JSpinner searchS;
+	private JButton rentB;
+	private JButton returnB;
 	
-	public static void main(String[] args) {
-		Boolean going = true;
-		while (going = true) {
-			System.out.println("");
-			System.out.println("1. View Catalogue");
-			System.out.println("2. Find Movie from ID");
-			System.out.println("3. Rent Movie");
-			System.out.println("4. Return Movie");
-			System.out.println("0. Quit");
-			System.out.print("Select Operation: ");
-			int op = scnr.nextInt();
-			System.out.println("");
-			
-			if (op == 1) {
-				System.out.print(viewCat());
-			}
-			
-			if (op == 2) {
-				System.out.print("Enter Movie ID: ");
-				System.out.print(displayMov(scnr.nextInt()));
-			}
-			
-			if (op == 3) {
-				System.out.print("Enter Movie ID: ");
-				rentMov(scnr.nextInt());
-			}
-			
-			if (op == 4) {
-				System.out.print("Enter Movie ID: ");
-				returnMov(scnr.nextInt());
+	SystemFrame() {
+		JLabel catL = new JLabel("Full Catalogue");
+		JLabel selectL = new JLabel("Selected Film");
+		JLabel idL = new JLabel("Enter ID:");
+		
+		catA = new JTextArea(20,20); //height, width
+		JScrollPane scrollP = new JScrollPane(catA);
+		catA.setEditable(false);
+		
+		selectA = new JTextArea(2,20);
+		selectA.setEditable(false);
+		
+		SpinnerNumberModel idM = new SpinnerNumberModel(0, 0, 2, 1); //init, min, max, step
+		searchS = new JSpinner(idM);
+		searchS.addChangeListener(this);
+		
+		rentB = new JButton("Rent");
+		rentB.addActionListener(this);
+		
+		returnB = new JButton("Return");
+		returnB.addActionListener(this);
+		
+		setLayout(new GridBagLayout());
+		GridBagConstraints layC = new GridBagConstraints();
+		layC.insets = new Insets(10,10,10,10);
+		layC.gridx = 0;
+		layC.gridy = 0;
+		add(catL, layC);
+		
+		layC.gridx = 1;
+		layC.gridwidth = 2;
+		add(selectL, layC);
+		
+		layC.gridx = 0;
+		layC.gridy = 2;
+		layC.gridwidth = 1;
+		layC.gridheight = 4;
+		layC.fill = GridBagConstraints.BOTH;
+		layC.weightx = 1.0;
+		layC.weighty = 1.0;
+		add(scrollP, layC);
+		
+		layC.gridx = 1;
+		layC.gridheight = 1;
+		layC.gridwidth = 2;
+		layC.weightx = 0;
+		layC.weighty = 0;
+		layC.fill = GridBagConstraints.NONE;
+		add(selectA, layC);
+		
+		layC.gridy = 3;
+		layC.gridwidth = 1;
+		add(idL, layC);
+		
+		layC.gridx = 2;
+		add(searchS, layC);
+		
+		layC.gridx = 1;
+		layC.gridy = 4;
+		layC.fill = GridBagConstraints.BOTH;
+		layC.weightx = 1.0;
+		layC.weighty = 0;
+		add(rentB,layC);
+		
+		layC.gridx = 2;
+		add(returnB,layC);
+		
+		catA.setText(Catalogue.viewCat());
+	}
+	
+	public void stateChanged(ChangeEvent event) {
+		if ((Integer) searchS.getValue() == 0) {
+			selectA.setText("");
+		}
+		else {
+			selectA.setText(Catalogue.displayMov((Integer) searchS.getValue()));
+		}
+	}
+	
+	public void actionPerformed(ActionEvent event) {
+		if ((JButton) event.getSource() == rentB) {
+			if ((Integer) searchS.getValue() != 0) {
+				Catalogue.reduceStock((Integer) searchS.getValue());
+				catA.setText(Catalogue.viewCat());
+				selectA.setText(Catalogue.displayMov((Integer) searchS.getValue()));
 			}
 		}
-		viewCat();
-		int fid = scnr.nextInt();
-		scnr.nextLine();
-		rentMov(fid);
-		System.out.println("");
-		viewCat();
-	}
-	
-	static String viewCat() {
-		String Select = "SELECT id, title, year, stock FROM movies";
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-	            PreparedStatement pstmt = conn.prepareStatement(Select)) {
-				
-	            ResultSet rs = pstmt.executeQuery();
-	            String printable = "";
-
-	            while (rs.next()) {
-	            	printable = printable + "ID: " + rs.getInt("id");
-	      			printable = printable + ", Title: " + rs.getString("title") + "\n";
-	      			printable = printable + "          Year: " + rs.getInt("year");
-	      			printable = printable + ", In Stock: " + rs.getInt("stock") + "\n";
-	      		}
-	      		rs.close();
-	      		return printable;
-	            // last exception
-	    } catch (SQLException e) {
-	            e.printStackTrace();
-	            return "Connection Broken";
-	    }
-	}
-	
-	static String displayMov(int fid) {
-		String Find = "SELECT id, title, year, stock FROM movies WHERE id = ?";
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-	            PreparedStatement pstmt = conn.prepareStatement(Find)) {
-
-				pstmt.setFloat(1, fid);
-	            ResultSet rs = pstmt.executeQuery();
-	            String printable = "";
-	            
-	            while (rs.next()) {
-	      			printable = printable + "ID: " + rs.getInt("id");
-	      			printable = printable + ", Title: " + rs.getString("title") + "\n";
-	      			printable = printable + "          Year: " + rs.getInt("year");
-	      			printable = printable + ", In Stock: " + rs.getInt("stock");
-	      		}
-	      		rs.close();
-	            return printable;
-	            // last exception
-	    } catch (SQLException e) {
-	            e.printStackTrace();
-	            return "Connection Broken";
-	    }
-	}
-	
-	static void rentMov(int fid) {
-		String Find = "SELECT id, title, year, stock FROM movies WHERE id = ?";
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-	            PreparedStatement pstmt = conn.prepareStatement(Find)) {
-
-				pstmt.setInt(1, fid);
-	            ResultSet rs = pstmt.executeQuery();
-	            
-	            while (rs.next()) {
-	      			System.out.print("ID: " + rs.getInt("id"));
-	      			System.out.print(", Title: " + rs.getString("title"));
-	      			System.out.print(", Year: " + rs.getInt("year"));
-	      			System.out.println(", In Stock: " + rs.getInt("stock"));
-	      			if (rs.getInt("stock") > 0) {
-	      				System.out.println("Rent Movie? (Y/N)");
-			            if (scnr.next().equals("Y")) {
-			            	reduceStock(fid);
-			            	System.out.println("Movie Rented");
-			            }
-	      			}
-	      			else {
-	      				System.out.println("Movie Currently Unavailible");
-	      			}
-	      		}
-	      		rs.close();
-	            // last exception
-	    } catch (SQLException e) {
-	            e.printStackTrace();
-	    }
-	}
-	
-	static void returnMov(int fid) {
-		String Title = "SELECT title FROM movies WHERE id = ?";
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-	            PreparedStatement pstmt = conn.prepareStatement(Title)) {
-
-				pstmt.setInt(1, fid);
-	            ResultSet rs = pstmt.executeQuery();
-	            
-	            if (1 == 1) {
-	            	increaseStock(fid);
-	            	while (rs.next()) {
-	            		System.out.println("'" + rs.getString("title") + "' returned. Thank you!");
-	            	}
-	            }
-	      		rs.close();
-	            // last exception
-	    } catch (SQLException e) {
-	            e.printStackTrace();
-	    }
-	}
-	
-	static void reduceStock(int fid) {
-		String reduceStock = "UPDATE movies SET stock = stock - 1 WHERE id = ?";
-		String getStock = "SELECT stock FROM movies WHERE id = ?";
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-	            PreparedStatement pstmt = conn.prepareStatement(reduceStock);
-				PreparedStatement getstock = conn.prepareStatement(getStock)) {
-
-			getstock.setInt(1, fid);
-            ResultSet rs = getstock.executeQuery();
-			pstmt.setInt(1, fid);
-			while (rs.next()) {
-				if(rs.getFloat("stock") > 0) {
-					pstmt.executeUpdate();
-				}
+		else if ((JButton) event.getSource() == returnB) {
+			if ((Integer) searchS.getValue() != 0) {
+				Catalogue.increaseStock((Integer) searchS.getValue());
+				catA.setText(Catalogue.viewCat());
+				selectA.setText(Catalogue.displayMov((Integer) searchS.getValue()));
 			}
-	            
-	            // last exception
-	    } catch (SQLException e) {
-	            e.printStackTrace();
-	    }
+		}
 	}
-	static void increaseStock(int fid) {
-		String increaseStock = "UPDATE movies SET stock = stock + 1 WHERE id = ?";
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-	            PreparedStatement pstmt = conn.prepareStatement(increaseStock)) {
-
-				pstmt.setInt(1, fid);
-	            pstmt.executeUpdate();
-	            
-	            // last exception
-	    } catch (SQLException e) {
-	            e.printStackTrace();
-	    }
+	
+	public static void main(String[] args) {
+		SystemFrame frame = new SystemFrame();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.pack();
+		frame.setVisible(true);
 	}
 }
