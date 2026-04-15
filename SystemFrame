@@ -85,6 +85,9 @@ public class SystemFrame extends JFrame implements ActionListener, ChangeListene
 		
 		layC.gridx = 1;
 		layC.gridy = 4;
+		layC.fill = GridBagConstraints.BOTH;
+		layC.weightx = 1.0;
+		layC.weighty = 0;
 		add(rentB,layC);
 		
 		layC.gridx = 2;
