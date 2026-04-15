@@ -119,7 +119,8 @@ public class UserGUI extends JFrame implements ActionListener {
             String pass = passwordField.getText();
 
             if (e.getSource() == createBtn) { // should need just three for here
-                UserDB.createUser(id, name, pass);
+                UserDB.createUser(id, name, pass); // I can just connect to UserDB for this part to make it smaller
+                // Do this with all of the options!!!
                 outputArea.append("User created!\n");
             }
 
