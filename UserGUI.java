@@ -150,8 +150,7 @@ public class UserGUI extends JFrame implements ActionListener {
             }
 
             else if (e.getSource() == viewCreditBtn) {
-                UserDB.viewCredit(id); //of id
-                outputArea.append("Check console for credit.\n");
+                outputArea.append(UserDB.viewCredit(id)+ "\n"); //of id
             }
 
             else if (e.getSource() == addHistoryBtn) {
@@ -161,8 +160,8 @@ public class UserGUI extends JFrame implements ActionListener {
             }
 
             else if (e.getSource() == viewHistoryBtn) {
-                UserDB.viewHistory(id);
-                outputArea.append("Check console for history.\n"); // could not get to show up
+                //UserDB.viewHistory(id);
+                outputArea.append(UserDB.viewHistory(id)+ "\n"); //of id
             }
 
         } catch (Exception ex) {
