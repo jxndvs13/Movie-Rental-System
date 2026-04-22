@@ -82,7 +82,7 @@ public class UserDB {
                     changePassword(idPass, newPassword);
                     break;
                     
-                case 5: // add creit
+                case 5: // add credit
                     System.out.println("Enter id:");
                     int idCredit = scnr.nextInt();
                     
@@ -92,11 +92,11 @@ public class UserDB {
                     addCredit(idCredit, amount); //id,amount to add
                     break;
                     
-                case 6: //view crdit here
+                case 6: //view credit here
                     System.out.println("Enter id:");
                     int idView = scnr.nextInt();
                     
-                    viewCredit(idView); //just view, that it
+                    System.out.println(viewCredit(idView)); //just view, that it
                     break;
                     
                 case 7:// add history
@@ -217,7 +217,7 @@ public class UserDB {
     }
     
     // Now for veiwing, like Credit
-    public static void viewCredit(int id) {
+    public static String viewCredit(int id) {
         String query = "SELECT credit FROM users WHERE id=?";
         
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
@@ -226,12 +226,17 @@ public class UserDB {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
             
+            String output = "";
+            
             if (rs.next()) {
-                System.out.println("Credit: $" + rs.getDouble("credit")); //it is a float!!
+                output = output + "Credit: $" + rs.getDouble("credit"); //it is a float!!
             }
+            
+            return output;
             
         } catch (SQLException e) {
             e.printStackTrace();
+            return "Connection Broken";
         }
     }
 
@@ -272,7 +277,7 @@ public class UserDB {
     }
 
     // don't forgget to view history
-    public static void viewHistory(int userId) {
+    public static String viewHistory(int userId) {
         String query = "SELECT record FROM history WHERE user_id=?";
         
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
@@ -281,13 +286,18 @@ public class UserDB {
             pstmt.setInt(1, userId);
             ResultSet rs = pstmt.executeQuery();
             
-            System.out.println("History:");
+            String output = "History:";
+            
             while (rs.next()) {
-                System.out.println("Hist - " + rs.getString("record")); //get string, but maybe array, **check**
+            	output = output + "Hist - " + rs.getString("record"); //it is a float!!
             }
+            
+            return output;
+            
             // last exception
         } catch (SQLException e) {
             e.printStackTrace();
+            return "Connection Broken";
         }
     }
     
