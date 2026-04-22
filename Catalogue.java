@@ -50,9 +50,9 @@ public class Catalogue {
 	}
 	
 	static String viewCat() {
-		String Select = "SELECT id, title, year, stock FROM movies";
+		String Select = "SELECT id, title, year, stock FROM movies ORDER BY id ASC";
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-	            PreparedStatement pstmt = conn.prepareStatement(Select)) {
+				PreparedStatement pstmt = conn.prepareStatement(Select)) {
 				
 	            ResultSet rs = pstmt.executeQuery();
 	            String printable = "";
