@@ -12,10 +12,51 @@ public class SystemFrame extends JFrame implements ActionListener, ChangeListene
 	private JButton rentB;
 	private JButton returnB;
 	
+	//text fields, and areas
+    private JTextField nameField, passwordField, creditField;
+    private JTextArea historyArea, outputArea;
+    // buttons, use Btn-shorter
+    private JButton createBtn, loginBtn, changeNameBtn, changePassBtn;
+    private JButton addCreditBtn, viewCreditBtn, addHistoryBtn, viewHistoryBtn;
+	
 	SystemFrame() {
 		JLabel catL = new JLabel("Full Catalogue");
-		JLabel selectL = new JLabel("Selected Film");
 		JLabel idL = new JLabel("Enter ID:");
+		JLabel selectL = new JLabel("Selected Film");
+        JLabel nameL = new JLabel("Username:"); //name
+        JLabel passL = new JLabel("Password:"); //pass
+        JLabel creditL = new JLabel("Credit:"); //credit
+        JLabel historyL = new JLabel("History:"); //history
+        
+        // Fields(5)
+        nameField = new JTextField(10);
+        passwordField = new JTextField(10);
+        creditField = new JTextField(10);
+        creditField.setEditable(false);
+        historyArea = new JTextArea(5, 10);
+
+        // I should have an output area
+        outputArea = new JTextArea(2, 20);
+        outputArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(outputArea);
+
+        // Buttons, need 8 for 8 actions
+        createBtn = new JButton("Create User");
+        loginBtn = new JButton("Login");
+        changeNameBtn = new JButton("Change Name");
+        changePassBtn = new JButton("Change Password");
+        addCreditBtn = new JButton("Add Credit");
+        viewCreditBtn = new JButton("View Credit");
+        addHistoryBtn = new JButton("Add History");
+        viewHistoryBtn = new JButton("View History");
+        
+        // my buttons
+        JButton[] buttons = {createBtn, loginBtn, changeNameBtn, changePassBtn,
+                             addCreditBtn, viewCreditBtn, addHistoryBtn, viewHistoryBtn};
+        
+        for (JButton b : buttons) {
+            b.addActionListener(this); //actions
+        }
 		
 		catA = new JTextArea(20,20); //height, width
 		JScrollPane scrollP = new JScrollPane(catA);
@@ -46,9 +87,9 @@ public class SystemFrame extends JFrame implements ActionListener, ChangeListene
 		add(selectL, layC);
 		
 		layC.gridx = 0;
-		layC.gridy = 2;
+		layC.gridy = 1;
 		layC.gridwidth = 1;
-		layC.gridheight = 4;
+		layC.gridheight = 8;
 		layC.fill = GridBagConstraints.BOTH;
 		layC.weightx = 1.0;
 		layC.weighty = 1.0;
@@ -62,7 +103,7 @@ public class SystemFrame extends JFrame implements ActionListener, ChangeListene
 		layC.fill = GridBagConstraints.NONE;
 		add(selectA, layC);
 		
-		layC.gridy = 3;
+		layC.gridy = 2;
 		layC.gridwidth = 1;
 		add(idL, layC);
 		
@@ -70,7 +111,7 @@ public class SystemFrame extends JFrame implements ActionListener, ChangeListene
 		add(searchS, layC);
 		
 		layC.gridx = 1;
-		layC.gridy = 4;
+		layC.gridy = 3;
 		layC.fill = GridBagConstraints.BOTH;
 		layC.weightx = 1.0;
 		layC.weighty = 0;
@@ -80,6 +121,37 @@ public class SystemFrame extends JFrame implements ActionListener, ChangeListene
 		add(returnB,layC);
 		
 		catA.setText(Catalogue.viewCat());
+        
+        // Row 1
+        layC.gridx=3; layC.gridy=0; add(nameL,layC);
+        layC.gridx=4; add(nameField,layC);
+        
+        // Row 2
+        layC.gridx=3; layC.gridy=1; add(passL,layC);
+        layC.gridx=4; add(passwordField,layC);
+        
+        // Row 3
+        layC.gridx=3; layC.gridy=2; add(creditL,layC);
+        layC.gridx=4; add(creditField,layC);
+        
+        // Row 4
+        layC.gridx=3; layC.gridy=3; add(historyL,layC);
+        layC.gridx=4; layC.gridheight=3; add(historyArea,layC);
+        
+        // Buttons (but with grid style)
+        layC.gridx=5; layC.gridy=0; layC.gridheight=1; add(createBtn,layC);
+        layC.gridy=1; add(loginBtn,layC);
+        layC.gridy=2; add(changeNameBtn,layC);
+        layC.gridy=3; add(changePassBtn,layC);
+        layC.gridy=4; add(addCreditBtn,layC);
+        layC.gridy=5; add(viewCreditBtn,layC);
+        layC.gridy=6; add(addHistoryBtn,layC);
+        layC.gridy=7; add(viewHistoryBtn,layC);
+        
+        // Output
+        layC.gridx=3; layC.gridy=6;
+        layC.gridwidth=2; layC.gridheight=2;
+        add(scrollPane,layC);
 	}
 	
 	public void stateChanged(ChangeEvent event) {
@@ -92,20 +164,64 @@ public class SystemFrame extends JFrame implements ActionListener, ChangeListene
 	}
 	
 	public void actionPerformed(ActionEvent event) {
-		if ((JButton) event.getSource() == rentB) {
+		if (event.getSource() == rentB) {
 			if ((Integer) searchS.getValue() != 0) {
 				Catalogue.reduceStock((Integer) searchS.getValue());
 				catA.setText(Catalogue.viewCat());
 				selectA.setText(Catalogue.displayMov((Integer) searchS.getValue()));
 			}
 		}
-		else if ((JButton) event.getSource() == returnB) {
+		else if (event.getSource() == returnB) {
 			if ((Integer) searchS.getValue() != 0) {
 				Catalogue.increaseStock((Integer) searchS.getValue());
 				catA.setText(Catalogue.viewCat());
 				selectA.setText(Catalogue.displayMov((Integer) searchS.getValue()));
 			}
 		}
+		if (event.getSource() == createBtn) { // should need just three for here
+            //UserDB.createUser(name, pass); // I can just connect to UserDB for this part to make it smaller
+            // Do this with all of the options!!!
+            outputArea.append("User created!\n");
+        }
+
+        else if (event.getSource() == loginBtn) { // may need more here
+           // if (user = null) {
+                outputArea.append("Login successful!\n");
+            //} else {
+                outputArea.append("Login failed.\n");
+           // }
+        }
+
+        else if (event.getSource() == changeNameBtn) {
+            //UserDB.changeName(name, name); // id and name to change
+            outputArea.append("Name changed.\n");
+        }
+
+        else if (event.getSource() == changePassBtn) {
+            //UserDB.changePassword(id, pass); //need an id and new password
+            outputArea.append("Password changed.\n");
+        }
+
+        else if (event.getSource() == addCreditBtn) {
+            double credit = Double.parseDouble(creditField.getText());
+            //UserDB.addCredit(id, credit); //id and credit
+            outputArea.append("Credit added.\n");
+        }
+
+        else if (event.getSource() == viewCreditBtn) {
+            //outputArea.append(UserDB.viewCredit(id)+ "\n"); //of id
+        }
+
+        else if (event.getSource() == addHistoryBtn) {
+            String record = historyArea.getText();
+            //UserDB.addHistory(id, record); //record
+            outputArea.append("History added.\n");
+        }
+
+        else if (event.getSource() == viewHistoryBtn) {
+            //UserDB.viewHistory(id);
+            //outputArea.append(UserDB.viewHistory(id)+ "\n"); //of id
+        }
 	}
 	
 	public static void main(String[] args) {
