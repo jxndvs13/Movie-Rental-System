@@ -8,6 +8,7 @@ public class UserDB {
     static final String USER = "root";
     static final String PASS = "";
     static Scanner scnr = new Scanner(System.in);
+    static String cUser = "";
     
     public static void main(String[] args) {
     	// going = true
@@ -132,10 +133,42 @@ public class UserDB {
         }
     }
     
+    public static Double getCredit (String input) {
+        String query = "SELECT credit FROM users WHERE name=?";
+        
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+        	
+            pstmt.setString(1, input);
+            ResultSet rs = pstmt.executeQuery();
+            
+            String output = "";
+            
+            if (rs.next()) {
+                return rs.getDouble("credit"); //it is a float!!
+            }
+            
+            return null;
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    public static Boolean checkName(String input) {
+    	if (input.equals(cUser)) {
+    		return true;
+    	}
+    	else {
+    		return false;
+    	}
+    }
+    
     // This is to Create a New User
     public static void createUser(int id, String name, String password) { //first is start
         String query = "INSERT INTO users (id, name, password, credit) VALUES (?, ?, ?, ?)"; //then query insert
-        // use try and error ,cattch = SQLException
+        // use try and error ,catch = SQLException
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS); //connect via sql
              PreparedStatement pstmt = conn.prepareStatement(query)) {
         	//id, name, password pstmt
@@ -216,7 +249,7 @@ public class UserDB {
         }
     }
     
-    // Now for veiwing, like Credit
+    // Now for viewing, like Credit
     public static String viewCredit(int id) {
         String query = "SELECT credit FROM users WHERE id=?";
         
@@ -276,7 +309,7 @@ public class UserDB {
         }
     }
 
-    // don't forgget to view history
+    // don't forget to view history
     public static String viewHistory(int userId) {
         String query = "SELECT record FROM history WHERE user_id=?";
         
