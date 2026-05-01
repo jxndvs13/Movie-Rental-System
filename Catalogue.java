@@ -96,6 +96,46 @@ public class Catalogue {
 	    }
 	}
 	
+	static String nameMov(int fid) {
+		String Find = "SELECT title FROM movies WHERE id = ?";
+		String output = "";
+		
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+	            PreparedStatement pstmt = conn.prepareStatement(Find)) {
+
+				pstmt.setFloat(1, fid);
+	            ResultSet rs = pstmt.executeQuery();
+	            
+	            while (rs.next()) {
+	      			output = rs.getString("title");
+	      		}
+	      		rs.close();
+	    } catch (SQLException e) {
+	            e.printStackTrace();
+	    }
+		return output;
+	}
+	
+	static double getPrice(int fid) {
+		String Find = "SELECT price FROM movies WHERE id = ?";
+		double output = 0.0;
+		
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+	            PreparedStatement pstmt = conn.prepareStatement(Find)) {
+
+				pstmt.setFloat(1, fid);
+	            ResultSet rs = pstmt.executeQuery();
+	            
+	            while (rs.next()) {
+	      			output = rs.getDouble("price");
+	      		}
+	      		rs.close();
+	    } catch (SQLException e) {
+	            e.printStackTrace();
+	    }
+		return output;
+	}
+	
 	static void rentMov(int fid) {
 		String Find = "SELECT id, title, year, stock FROM movies WHERE id = ?";
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
