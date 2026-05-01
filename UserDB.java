@@ -10,159 +10,109 @@ public class UserDB {
     static Scanner scnr = new Scanner(System.in);
     static String cUser = "";
     
-    public static void main(String[] args) {
-    	// going = true
-        boolean going = true;
-        
-        while (going) {
-        	System.out.println(" ");
-            System.out.println("Menu for User");
-            System.out.println("1. New User");
-            System.out.println("2. User Login");
-            System.out.println("3. Change Name");
-            System.out.println("4. Change Password");
-            System.out.println("5. Add Credit");
-            System.out.println("6. View Credit");
-            System.out.println("7. Add History");
-            System.out.println("8. View History");
-            System.out.println("9. Exit"); // need an exit
-            
-            int op = scnr.nextInt();
-            scnr.nextLine(); // need to clear buffer
-            // make the menu 1-9
-            switch (op) {
-            // 1
-                case 1: // new login
-                    System.out.println("Enter id:");
-                    int id = scnr.nextInt();
-                    scnr.nextLine();
-                    
-                    System.out.println("Enter Name:");
-                    String name = scnr.nextLine();
-                    
-                    System.out.println("Enter Password:");
-                    String pass = scnr.nextLine();
-                    
-                    createUser(id, name, pass);
-                    break;
-                    
-                case 2: //user login
-                    System.out.println("Enter Name:");
-                    String loginName = scnr.nextLine();
-
-                    System.out.println("Enter Password:");
-                    String loginPass = scnr.nextLine();
-                    
-                    User user = login(loginName, loginPass);
-                    if (user != null) {
-                        System.out.println("Login successful!" );
-                    } else {
-                        System.out.println("Invalid login.");
-                    }
-                    break;
-                    
-                case 3: // change name
-                    System.out.println("Enter id:");
-                    int idName = scnr.nextInt();
-                    scnr.nextLine();
-                    // new name
-                    System.out.println("Enter new name:");
-                    String newName = scnr.nextLine(); //newName
-                    
-                    changeName(idName, newName);
-                    break;
-                    
-                case 4: // change password
-                    System.out.println("Enter id:");
-                    int idPass = scnr.nextInt();
-                    scnr.nextLine();
-                    // new password
-                    System.out.println("Enter new password:");
-                    String newPassword = scnr.nextLine(); //newPassword
-                    
-                    changePassword(idPass, newPassword);
-                    break;
-                    
-                case 5: // add credit
-                    System.out.println("Enter id:");
-                    int idCredit = scnr.nextInt();
-                    
-                    System.out.println("Enter Credit:");
-                    double amount = scnr.nextDouble();
-                    
-                    addCredit(idCredit, amount); //id,amount to add
-                    break;
-                    
-                case 6: //view credit here
-                    System.out.println("Enter id:");
-                    int idView = scnr.nextInt();
-                    
-                    System.out.println(viewCredit(idView)); //just view, that it
-                    break;
-                    
-                case 7:// add history
-                	
-                    System.out.println("Enter user id:");
-                    int userId = scnr.nextInt();
-                    scnr.nextLine();
-                    
-                    System.out.println("Enter history record:");
-                    String record = scnr.nextLine();
-                    
-                    addHistory(userId, record);
-                    break;
-                    
-                case 8: //now view the history
-                    System.out.println("Enter user id:");
-                    int histId = scnr.nextInt();
-                    
-                    viewHistory(histId);
-                    break;
-                    
-                case 9: //EXIT!!
-                    going = false;
-                    System.out.println("Goodbye!");
-                    break;
-                    
-                    
-                    
-                default: //need a default for the menu
-                	
-                    System.out.println("Invalid option.");
-            }
-        }
-    }
-    
-    public static Double getCredit (String input) {
+    public static Double getCredit () {
         String query = "SELECT credit FROM users WHERE name=?";
+        Double output = 0.0;
         
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
              PreparedStatement pstmt = conn.prepareStatement(query)) {
-        	
-            pstmt.setString(1, input);
-            ResultSet rs = pstmt.executeQuery();
-            
-            String output = "";
+
+            pstmt.setString(1, cUser);
+            ResultSet rs = pstmt.executeQuery();            
             
             if (rs.next()) {
-                return rs.getDouble("credit"); //it is a float!!
+                output = rs.getDouble("credit");
             }
-            
-            return null;
-            
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
         }
+        return output;
     }
     
-    public static Boolean checkName(String input) {
-    	if (input.equals(cUser)) {
-    		return true;
-    	}
-    	else {
-    		return false;
-    	}
+    public static int getRentId() {
+    	String query = "SELECT rented FROM users WHERE name=?";
+        int output = -1;
+        
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, cUser);
+            ResultSet rs = pstmt.executeQuery();            
+            
+            if (rs.next()) {
+                output = rs.getInt("rented");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return output;
+    }
+    
+    public static String getRented() {
+        String query = "SELECT rented FROM users WHERE name=?";
+        String output = "none";
+        
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, cUser);
+            ResultSet rs = pstmt.executeQuery();            
+            
+            if (rs.next()) {
+                if (rs.getInt("rented") == 0) {}
+                else{
+                	output = Catalogue.displayMov(rs.getInt("rented"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return output;
+    }
+    
+    public static String getRawHistory() {
+        String query = "SELECT history FROM users WHERE name=?";
+        String output = "";
+        
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, cUser);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                output = rs.getString("history");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return output;
+    }
+    
+    public static String getHistory() {
+        String query = "SELECT history FROM users WHERE name=?";
+        String output = "";
+        
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, cUser);
+            ResultSet rs = pstmt.executeQuery();
+            String regex = "[,\\.\\s]";
+            
+            if (rs.next()) {
+                if (rs.getString("history").equals("")) {}
+                else{
+                	String[] list = rs.getString("history").split(regex);
+                    for (String i : list) {
+                    	output = output + Catalogue.nameMov(Integer.parseInt(i)) + "\n";
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return output;
     }
     
     // This is to Create a New User
@@ -185,9 +135,10 @@ public class UserDB {
         }
     }
     
-    // I need a way to login 
-    public static User login(String name, String password) {
+    public static String login(String name, String password) {
         String query = "SELECT * FROM users WHERE name=? AND password=?";
+        String output = "Login Failed\n";
+    	cUser = "";
         
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -199,18 +150,14 @@ public class UserDB {
             ResultSet rs = pstmt.executeQuery();
             
             if (rs.next()) {
-                return new User(
-                    rs.getString("id"), //Should be a getInt, but will not work
-                    rs.getString("name"),
-                    rs.getString("password")
-                );
+                cUser = name;
+                output = "Login Successful\n";
             }
             //exception, again, just include this
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        
-        return null; // login fail
+        return output;
     }
     
     // This is the first one, to Change a Name
@@ -248,43 +195,38 @@ public class UserDB {
             e.printStackTrace();
         }
     }
-    
-    // Now for viewing, like Credit
-    public static String viewCredit(int id) {
-        String query = "SELECT credit FROM users WHERE id=?";
+
+    // Then add Credit
+    public static String addCredit(double amount) {
+        String query = "UPDATE users SET credit = credit + ? WHERE name=?";
+        
+        String output = "Operation Failed";
         
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            PreparedStatement pstmt = conn.prepareStatement(query)) {
         	
-            pstmt.setInt(1, id);
-            ResultSet rs = pstmt.executeQuery();
-            
-            String output = "";
-            
-            if (rs.next()) {
-                output = output + "Credit: $" + rs.getDouble("credit"); //it is a float!!
-            }
-            
-            return output;
+            pstmt.setDouble(1, amount);
+            pstmt.setString(2, cUser);
+            //added it
+            pstmt.executeUpdate();
+            output = "Credit Added";
             
         } catch (SQLException e) {
             e.printStackTrace();
-            return "Connection Broken";
         }
+        return output;
     }
-
-    // Then add Credit
-    public static void addCredit(int id, double amount) {
-        String query = "UPDATE users SET credit = credit + ? WHERE id=?";
-        
+    
+    public static void takeCredit(double amount) {
+        String query = "UPDATE users SET credit = credit - ? WHERE name=?";
+                
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            PreparedStatement pstmt = conn.prepareStatement(query)) {
         	
             pstmt.setDouble(1, amount);
-            pstmt.setInt(2, id);
+            pstmt.setString(2, cUser);
             //added it
             pstmt.executeUpdate();
-            System.out.println("Credit added.");
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -292,17 +234,32 @@ public class UserDB {
     }
 
     // Also history, so add to history
-    public static void addHistory(int userId, String record) {
-        String query = "INSERT INTO history (user_id, record) VALUES (?, ?)";
+    public static void addHistory(int id) {
+        String query = "UPDATE users SET history = ? WHERE name = ?";
         
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
              PreparedStatement pstmt = conn.prepareStatement(query)) {
         	
-            pstmt.setInt(1, userId);
-            pstmt.setString(2, record);
+            pstmt.setString(1, getRawHistory() + id + " ");
+            pstmt.setString(2, cUser);
             
             pstmt.executeUpdate();
-            System.out.println("The History has been added.");
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public static void setRented(int id) {
+        String query = "UPDATE users SET rented = ? WHERE name = ?";
+        
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+        	
+            pstmt.setInt(1, id);
+            pstmt.setString(2, cUser);
+            
+            pstmt.executeUpdate();
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -333,6 +290,4 @@ public class UserDB {
             return "Connection Broken";
         }
     }
-    
-    
 }
