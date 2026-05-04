@@ -116,23 +116,24 @@ public class UserDB {
     }
     
     // This is to Create a New User
-    public static void createUser(int id, String name, String password) { //first is start
-        String query = "INSERT INTO users (id, name, password, credit) VALUES (?, ?, ?, ?)"; //then query insert
+    public static String createUser(String name, String password) { //first is start
+        String query = "INSERT INTO users (name, password) VALUES (?, ?)"; //then query insert
+        String output = "User Creation Failed\n";
         // use try and error ,catch = SQLException
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS); //connect via sql
              PreparedStatement pstmt = conn.prepareStatement(query)) {
         	//id, name, password pstmt
-            pstmt.setInt(1, id);
-            pstmt.setString(2, name);
-            pstmt.setString(3, password);
-            pstmt.setDouble(4, 0); //may be error
-            //update, say it did
+            pstmt.setString(1, name);
+            pstmt.setString(2, password);
+            
+            output = "User " + name + " Created\n";
+            
             pstmt.executeUpdate();
-            System.out.println("User created!"); //put system outs here!
             //exception
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return output;
     }
     
     public static String login(String name, String password) {
@@ -151,7 +152,7 @@ public class UserDB {
             
             if (rs.next()) {
                 cUser = name;
-                output = "Login Successful\n";
+                output = "Logged in as " + cUser + "\n";
             }
             //exception, again, just include this
         } catch (SQLException e) {
@@ -161,46 +162,52 @@ public class UserDB {
     }
     
     // This is the first one, to Change a Name
-    public static void changeName(int id, String newName) { // a newName
-        String query = "UPDATE users SET name=? WHERE id=?";
+    public static String changeName(String newName) { // a newName
+        String query = "UPDATE users SET name=? WHERE name=?";
+        String output = "Username Unchanged";
         
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
              PreparedStatement pstmt = conn.prepareStatement(query)) {
         	
             pstmt.setString(1, newName);
-            pstmt.setInt(2, id);
+            pstmt.setString(2, cUser);
             
             pstmt.executeUpdate();
-            System.out.println("Your Name has been Changed. " );
+            output = "Password changed from \"" + cUser + "\" to \"" + newName + "\"\n";
+            cUser = newName;
             
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return output;
     }
     
     // Then this is to Change a Password
-    public static void changePassword(int id, String newPassword) { // use newPassword
-        String query = "UPDATE users SET password=? WHERE id=?";
+    public static String changePassword(String newPassword) { // use newPassword
+        String query = "UPDATE users SET password=? WHERE name=?";
+        String output = "Password Unchanged";
         
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
              PreparedStatement pstmt = conn.prepareStatement(query)) {
         	
             pstmt.setString(1, newPassword);
-            pstmt.setInt(2, id);
+            pstmt.setString(2, cUser);
             
             pstmt.executeUpdate();
-            System.out.println("Password Changed. ");
+            output = "Username changed from to \"" + newPassword + "\"\n";
             
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        
+        return output;
     }
 
     // Then add Credit
     public static String addCredit(double amount) {
         String query = "UPDATE users SET credit = credit + ? WHERE name=?";
         
-        String output = "Operation Failed";
+        String output = "Operation Failed\n";
         
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
             PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -209,8 +216,15 @@ public class UserDB {
             pstmt.setString(2, cUser);
             //added it
             pstmt.executeUpdate();
-            output = "Credit Added";
-            
+            if (amount > 0) {
+                output = "$" + amount + " Added\n";
+            }
+            else if (amount < 0) {
+                output = "$" + (-1 * amount) + " Removed\n";
+            }
+            else {
+                output = "Credit Not Changed\n";
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -250,8 +264,9 @@ public class UserDB {
         }
     }
     
-    public static void setRented(int id) {
+    public static String setRented(int id) {
         String query = "UPDATE users SET rented = ? WHERE name = ?";
+        String output = "Operation Failed\n";
         
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -261,33 +276,12 @@ public class UserDB {
             
             pstmt.executeUpdate();
             
+            output = Catalogue.nameMov(id) + " Succesfully Rented\n";
+            
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    // don't forget to view history
-    public static String viewHistory(int userId) {
-        String query = "SELECT record FROM history WHERE user_id=?";
         
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
-        	
-            pstmt.setInt(1, userId);
-            ResultSet rs = pstmt.executeQuery();
-            
-            String output = "History:";
-            
-            while (rs.next()) {
-            	output = output + "Hist - " + rs.getString("record"); //it is a float!!
-            }
-            
-            return output;
-            
-            // last exception
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return "Connection Broken";
-        }
+        return output;
     }
 }
