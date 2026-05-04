@@ -68,7 +68,7 @@ public class SystemFrame extends JFrame implements ActionListener, ChangeListene
 		selectA = new JTextArea(2,20);
 		selectA.setEditable(false);
 		
-		SpinnerNumberModel idM = new SpinnerNumberModel(0, 0, 4, 1); //init, min, max, step
+		SpinnerNumberModel idM = new SpinnerNumberModel(0, 0, 10, 1); //init, min, max, step
 		searchS = new JSpinner(idM);
 		searchS.addChangeListener(this);
 		
