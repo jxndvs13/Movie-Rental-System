@@ -17,7 +17,7 @@ public class SystemFrame extends JFrame implements ActionListener, ChangeListene
     private JTextArea historyArea, outputArea, rentedArea;
     // buttons, use Btn-shorter
     private JButton createBtn, loginBtn, changeNameBtn, changePassBtn;
-    private JButton addCreditBtn, addHistoryBtn;
+    private JButton addCreditBtn;
 	
 	SystemFrame() {
 		JLabel catL = new JLabel("Full Catalogue");
@@ -52,11 +52,10 @@ public class SystemFrame extends JFrame implements ActionListener, ChangeListene
         changeNameBtn = new JButton("Change Name");
         changePassBtn = new JButton("Change Password");
         addCreditBtn = new JButton("Add Credit");
-        addHistoryBtn = new JButton("Add History");
         
         // my buttons
         JButton[] buttons = {createBtn, loginBtn, changeNameBtn, changePassBtn,
-                             addCreditBtn, addHistoryBtn};
+                             addCreditBtn};
         
         for (JButton b : buttons) {
             b.addActionListener(this); //actions
@@ -94,7 +93,7 @@ public class SystemFrame extends JFrame implements ActionListener, ChangeListene
 		layC.gridx = 0;
 		layC.gridy = 1;
 		layC.gridwidth = 1;
-		layC.gridheight = 7;
+		layC.gridheight = 8;
 		layC.fill = GridBagConstraints.BOTH;
 		layC.weightx = 1.0;
 		layC.weighty = 1.0;
@@ -102,25 +101,23 @@ public class SystemFrame extends JFrame implements ActionListener, ChangeListene
 
 		layC.insets = new Insets(5,5,5,5);
 		layC.gridx = 1;
-		layC.gridheight = 1;
+		layC.gridheight = 2;
 		layC.gridwidth = 2;
 		layC.weightx = 0;
 		layC.weighty = 0;
 		layC.fill = GridBagConstraints.NONE;
 		add(selectA, layC);
 		
-		layC.gridy = 2;
-		layC.gridwidth = 1;
+		layC.gridy = 3;
+		layC.gridheight = 1; layC.gridwidth = 1;
 		add(idL, layC);
 		
 		layC.gridx = 2;
 		add(searchS, layC);
 		
 		layC.gridx = 1;
-		layC.gridy = 3;
+		layC.gridy = 4;
 		layC.fill = GridBagConstraints.BOTH;
-		layC.weightx = 1.0;
-		layC.weighty = 0;
 		add(rentB,layC);
 		
 		layC.gridx = 2;
@@ -129,47 +126,44 @@ public class SystemFrame extends JFrame implements ActionListener, ChangeListene
 		catA.setText(Catalogue.viewCat());
         
         // Row 1
-		layC.insets = new Insets(10,5,5,5);
-        layC.gridx=3; layC.gridy=0; add(nameL,layC);
+		layC.gridy=0; layC.insets = new Insets(10,5,5,5);
+        layC.gridx=3; add(nameL,layC);
         layC.gridx=4; add(nameField,layC);
+        layC.gridx=5; add(createBtn,layC);
         
         // Row 2
-		layC.insets = new Insets(5,5,5,5);
-        layC.gridx=3; layC.gridy=1; add(passL,layC);
+        layC.gridy=1; layC.insets = new Insets(5,5,5,5);
+        layC.gridx=3; add(passL,layC);
         layC.gridx=4; add(passwordField,layC);
+        layC.gridx=5; add(loginBtn,layC);
         
         // Row 3
-        layC.gridx=3; layC.gridy=2; add(creditL,layC);
+        layC.gridy=2; layC.gridheight=2;
+        layC.gridx=3; add(creditL,layC);
         layC.gridx=4; add(creditField,layC);
-
+        layC.gridx=5; add(changeNameBtn,layC);
         
         // Row 4
-        layC.gridx=3; layC.gridy=3; add(depositL,layC);
+        layC.gridy=4; layC.gridheight=1;
+        layC.gridx=3; add(depositL,layC);
         layC.gridx=4; add(depositField,layC);
+        layC.gridx=5; add(changePassBtn,layC);
         
         // Row 5
-        layC.gridx=3; layC.gridy=4; add(historyL,layC);
+        layC.gridy=5;
+        layC.gridx=3; add(historyL,layC);
+        layC.gridx=5; add(addCreditBtn,layC);
         layC.gridx=4; layC.gridheight=4; layC.insets = new Insets(5,5,10,5);
 		add(historyArea,layC);
         
-        // Buttons (but with grid style)
-        layC.gridx=5; layC.gridy=0; layC.gridheight=1;
-		layC.insets = new Insets(10,5,5,5); add(createBtn,layC);
-		layC.insets = new Insets(5,5,5,5);
-        layC.gridy=1; add(loginBtn,layC);
-        layC.gridy=2; add(changeNameBtn,layC);
-        layC.gridy=3; add(changePassBtn,layC);
-        layC.gridy=4; add(addCreditBtn,layC);
-        layC.gridy=5; add(addHistoryBtn,layC);
-        
-        // Rented
-        layC.gridx=1; layC.gridy=4;
-        add(rentedL,layC);
-        layC.gridy=5; layC.gridwidth=2;
+        //Rented
+        layC.gridy=5; layC.gridheight=1; layC.insets = new Insets(5,5,5,5);
+        layC.gridx=1; add(rentedL,layC);
+        layC.gridy=6; layC.gridwidth=2;
         add(rentedArea,layC);
         
         // Output
-        layC.gridx=1; layC.gridy=6; layC.gridheight=2; layC.gridwidth=3;
+        layC.gridx=1; layC.gridy=7; layC.gridheight=2; layC.gridwidth=3;
         layC.insets = new Insets(5,5,10,5);
 		add(scrollPane,layC);
 	}
@@ -179,51 +173,63 @@ public class SystemFrame extends JFrame implements ActionListener, ChangeListene
 	}
 	
 	public void actionPerformed(ActionEvent event) {
+		//Rent Movie
 		if (event.getSource() == rentB) {
 			int movid = (Integer) searchS.getValue();
-			if (movid != 0 && UserDB.getCredit() >= Catalogue.getPrice(movid) && UserDB.getRentId() == 0) {
-				Catalogue.reduceStock(movid);
-				UserDB.setRented(movid);
-				UserDB.takeCredit(Catalogue.getPrice(movid));
-				UserDB.addHistory(movid);
+			if (movid == 0) {
+				outputArea.append("Please Select a Film\n");
+			}
+			else {
+				if (UserDB.getRentId() != 0) {
+					outputArea.append("Please Return your Rented Film\n");
+				}
+				else if (UserDB.getCredit() < Catalogue.getPrice(movid)) {
+					outputArea.append("Please Deposit More Credit\n");
+				}
+				else {
+					Catalogue.reduceStock(movid);
+					outputArea.append(UserDB.setRented(movid));
+					UserDB.takeCredit(Catalogue.getPrice(movid));
+					UserDB.addHistory(movid);
+				}
 			}
 		}
+		
+		//Return Movie
 		else if (event.getSource() == returnB) {
 			if (UserDB.getRentId() != 0) {
 				Catalogue.increaseStock(UserDB.getRentId());
 				UserDB.setRented(0);
 			}
 		}
-		if (event.getSource() == createBtn) { // should need just three for here
-            //UserDB.createUser(name, pass); // I can just connect to UserDB for this part to make it smaller
-            // Do this with all of the options!!!
-            outputArea.append("User created!\n");
+		
+		//Create User
+		else if (event.getSource() == createBtn) {
+            outputArea.append(UserDB.createUser(nameField.getText(),passwordField.getText()));
+            outputArea.append(UserDB.login(nameField.getText(),passwordField.getText()));
+            passwordField.setText("");
         }
 
-        else if (event.getSource() == loginBtn) {
+        //Login as User
+		else if (event.getSource() == loginBtn) {
            outputArea.append(UserDB.login(nameField.getText(),passwordField.getText()));
-           update();
+           passwordField.setText("");
         }
 
-        else if (event.getSource() == changeNameBtn) {
-            //UserDB.changeName(name, name); // id and name to change
-            outputArea.append("Name changed.\n");
+        //Change Username
+		else if (event.getSource() == changeNameBtn) {
+            outputArea.append(UserDB.changeName(nameField.getText()));
         }
 
+		//Change Password
         else if (event.getSource() == changePassBtn) {
-            //UserDB.changePassword(id, pass); //need an id and new password
-            outputArea.append("Password changed.\n");
+            outputArea.append(UserDB.changePassword(passwordField.getText()));
         }
 
+		//Add Credit
         else if (event.getSource() == addCreditBtn) {
-        	outputArea.append(UserDB.addCredit(Double.parseDouble(depositField.getText())) + "\n");
+        	outputArea.append(UserDB.addCredit(Double.parseDouble(depositField.getText())));
         	depositField.setText("");
-        }
-
-        else if (event.getSource() == addHistoryBtn) {
-            String record = historyArea.getText();
-            //UserDB.addHistory(id, record); //record
-            outputArea.append("History added.\n");
         }
 		
 		update();
